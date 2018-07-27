@@ -483,10 +483,15 @@
 
                     //attempt to make the payment
                     $log.info("wallet: paying", $scope.pay);
+                    var payOptions = {
+                        prioboost: $scope.sendInput.feeChoice === 'prioboost',
+                        bip70PaymentUrl: $scope.sendInput.paymentDetails ? $scope.sendInput.paymentDetails.paymentUrl : false,
+                        bip70MerchantData: $scope.sendInput.paymentDetails ? $scope.sendInput.paymentDetails.merchantData : false
+                    };
 
                     var feeStrategy = $scope.sendInput.feeChoice === 'prioboost' ? blocktrailSDK.Wallet.FEE_STRATEGY_MIN_RELAY_FEE : $scope.sendInput.feeChoice;
                     // wallet is returned by promise chain
-                    return $q.when(wallet.pay($scope.pay, null, $scope.useZeroConf, true, feeStrategy, null, {prioboost: $scope.sendInput.feeChoice === $scope.PRIOBOOST})).then(function(txHash) {
+                    return $q.when(wallet.pay($scope.pay, null, $scope.useZeroConf, true, feeStrategy, null, payOptions)).then(function(txHash) {
                         wallet.lock();
                         return $q.when(txHash);
                     }, function(err) {
